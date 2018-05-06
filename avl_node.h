@@ -3,7 +3,6 @@
 //
 #include<iostream>
 #include<cstdio>
-#include <assert.h>
 #include <cmath>
 
 using namespace std;
@@ -21,11 +20,6 @@ struct avl_node {
     int heightLeft;
     //    struct avl_node *father;
 };
-
-
-const int UNDECLARED = 0;
-const int LEFT = 1;
-const int RIGHT = 2;
 
 
 template<typename T, typename Pred>
@@ -47,15 +41,8 @@ public:
 
     avl_node<T> *rl_rotate(avl_node<T> *node);
 
-    T *extract_data_to_array(int size);
+    T *extract_data_to_array(int);
 
-//
-//    void array_to_tree(T *arr, int size);
-//
-//    void update_node_data_by_function(Pred function);
-//
-//    int count_avl_nodes();
-//
     avl_node<T> *removeNodeAux(avl_node<T> *root, avl_node<T> *father, const T
     &data);
 
@@ -76,7 +63,7 @@ public:
 
     void inOrder(avl_node<T> *head);
 
-    void insert_into_array_aux(T *, int, avl_node<T> *);
+    void insert_into_array_aux(T *, int*, avl_node<T> *);
 
     void copyNode(avl_node<T> *const to, const avl_node<T> *from);
 
@@ -105,15 +92,33 @@ public:
     void build_empty_tree(int n, avl_node<T> *node);
 
     void updateTreeHeight(avl_node<T> *node);
-    void insert_into_tree(int *size, T *arr, avl_node<T> *node,
-                                             int *index) ;
+
+//
+    void insert_into_tree_from_array(int *size, T *arr, avl_node<T> *node,
+                                     int *index);
+
+    bool exists_in_avl_tree(avl_node<T> *, T data);
+
     class TreeException : public std::exception {
     };
 
     class DataNotInTree : TreeException {
     };
 
+    class AlreadyExistsInTree : TreeException {
+    };
+
 };
+
+template<typename T, typename Pred>
+bool avl_tree<T, Pred>::exists_in_avl_tree(avl_node<T> *node, T data) {
+    if (node == nullptr)
+        return false;
+    if (data == node->data)
+        return true;
+    return exists_in_avl_tree(node->left, data) || exists_in_avl_tree(node->right, data);
+}
+
 
 template<typename T, typename Pred>
 avl_node<T> *avl_tree<T, Pred>::insert_node(avl_node<T> *root, T data) {
@@ -133,7 +138,7 @@ avl_node<T> *avl_tree<T, Pred>::insert_node(avl_node<T> *root, T data) {
                      ? root->left->heightLeft
                      : root->left->heightRight);
         root = balance(root);
-    } else if (data >= root->data) {
+    } else if (data > root->data) {
         root->right = insert_node(root->right, data);
         root->heightRight = 1 +
                             (root->right->heightLeft >
@@ -141,7 +146,8 @@ avl_node<T> *avl_tree<T, Pred>::insert_node(avl_node<T> *root, T data) {
                              ? root->right->heightLeft
                              : root->right->heightRight);
         root = balance(root);
-    }
+    } else if (data == root->data)
+        throw AlreadyExistsInTree();
     return root;
 }
 
@@ -227,20 +233,22 @@ avl_node<T> *avl_tree<T, Pred>::balance(avl_node<T> *temp) {
 
 template<typename T, typename Pred>
 T *avl_tree<T, Pred>::extract_data_to_array(int size) {
-//    int count_nodes = this->count_total_node(this->head);
     T *treeArray = new T[size];
-    insert_into_array_aux(treeArray, 0, this->head);
+    int i=0;
+    insert_into_array_aux(treeArray, &i, this->head);
+    return treeArray;
 }
 
 
 template<typename T, typename Pred>
-void avl_tree<T, Pred>::insert_into_array_aux(T *array, int index,
+void avl_tree<T, Pred>::insert_into_array_aux(T *array, int *index,
                                               avl_node<T> *node) {
     if (node == nullptr)
         return;
     insert_into_array_aux(array, index, node->left);
-    array[index] = node->data;
-    insert_into_array_aux(array, index + 1, node->right);
+    array[*index] = node->data;
+    *index = *index + 1;
+    insert_into_array_aux(array, index, node->right);
 }
 
 //
@@ -299,8 +307,6 @@ avl_node<T> *avl_tree<T, Pred>::findNextByInorder(avl_node<T> *root) {
 template<typename T, typename Pred>
 avl_node<T> *avl_tree<T, Pred>::removeNodeAux(avl_node<T> *root, avl_node<T>
 *father, const T &data) {
-
-
     if (root == nullptr) {
         return root;
     }
@@ -341,9 +347,14 @@ avl_node<T> *avl_tree<T, Pred>::removeNodeAux(avl_node<T> *root, avl_node<T>
     // UPDATE HEIGHT OF THE CURRENT NODE
     updateHeight(root);
     if (father != nullptr && father->right == root) {
+//        updateHeight(father);
         father->right = balance(root);
     } else if (father != nullptr && father->left == root) {
+//        updateHeight(father);
         father->left = balance(root);
+    } else if (father == nullptr && ((root->heightLeft - root->heightRight) > 1 ||
+                                     (root->heightLeft - root->heightRight) < -1)) {
+        this->head = balance(root);
     } else {
         this->head = root;
     }
@@ -353,6 +364,9 @@ avl_node<T> *avl_tree<T, Pred>::removeNodeAux(avl_node<T> *root, avl_node<T>
 
 template<typename T, typename Pred>
 void avl_tree<T, Pred>::removeNode(const T &data) {
+    if (!exists_in_avl_tree(this->head, data)) {
+        throw DataNotInTree();
+    }
     removeNodeAux(this->head, nullptr, data);
 };
 
@@ -445,7 +459,7 @@ void avl_tree<T, Pred>::array_to_tree(T *arr, int size,
     build_empty_tree(n, avlFinal->head);
     remove_unnessesery_nodes(&size, &n, avlFinal->head, nullptr);
     int i;
-    insert_into_tree(&size, arr, avlFinal, &i);
+    insert_into_tree_from_array(&size, arr, avlFinal, &i);
     updateTreeHeight(avlFinal);
 }
 
@@ -459,16 +473,16 @@ void avl_tree<T, Pred>::updateTreeHeight(avl_node<T> *node) {
 }
 
 template<typename T, typename Pred>
-void avl_tree<T, Pred>::insert_into_tree(int *size, T *arr, avl_node<T> *node,
-                                         int *index) {
+void avl_tree<T, Pred>::insert_into_tree_from_array(int *size, T *arr, avl_node<T> *node,
+                                                    int *index) {
     if (*size == ((*index) + 1))
         return;
     if (node == nullptr)
         return;
-    insert_into_tree(size, arr, node->left, index);
+    insert_into_tree_from_array(size, arr, node->left, index);
     node->data = arr[index];
     *index = *index + 1;
-    insert_into_tree(size, arr, node->right, index);
+    insert_into_tree_from_array(size, arr, node->right, index);
 }
 
 

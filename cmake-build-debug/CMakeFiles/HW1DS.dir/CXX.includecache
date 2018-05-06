@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Technion/Matam2/HW1DS/avl_node.h
+iostream
+-
+cstdio
+-
+cmath
+-
+
+C:/Technion/Matam2/HW1DS/main.cpp
+iostream
+-
+cstdlib
+-
+assert.h
+-
+avl_node.h
+C:/Technion/Matam2/HW1DS/avl_node.h
+
