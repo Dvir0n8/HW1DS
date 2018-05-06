@@ -1,139 +1,91 @@
 #include <iostream>
-#include <cstdlib>
-#include <assert.h>
-
+#include "Player.h"
 #include "avl_node.h"
 
+class changeData {
+    int number;
+    int newNum;
+public:
+    changeData(int num,int newNum):number(num),newNum(newNum){};
+    bool operator()(int& n){
+        if (n==number){
+            n=newNum;
+            return true;
+        }
+        return false;
+    }
+};
 
-void checkInsert() {
-    avl_tree<int, int> a = avl_tree<int, int>();
-    a.head = a.insert_node(a.head, 1);
-    a.head = a.insert_node(a.head, 2);
-    a.head = a.insert_node(a.head, 4);
-    a.head = a.insert_node(a.head, 20);
-    a.head = a.insert_node(a.head, 3);
-    a.head = a.insert_node(a.head, 5);
-    a.head = a.insert_node(a.head, 7);
-    a.head = a.insert_node(a.head, 21);
-    try {
-        a.head = a.insert_node(a.head, 5);
-    } catch (avl_tree<int, int>::AlreadyExistsInTree &e) {
-        std::cout << "Working!!! - 5 is Already in the tree" << std::endl;
-    }
-    try {
-        a.head = a.insert_node(a.head, 7);
-    } catch (avl_tree<int, int>::AlreadyExistsInTree &e) {
-        std::cout << "Working!!! - 7 is Already in the tree" << std::endl;
-    }
-    a.head = a.insert_node(a.head, 8);
-    try {
-        a.head = a.insert_node(a.head, 8);
-    } catch (avl_tree<int, int>::AlreadyExistsInTree &e) {
-        std::cout << "Working!!! - 8 is Already in the tree" << std::endl;
-    }
-    a.head = a.insert_node(a.head, 99);
-    a.head = a.insert_node(a.head, 100);
-    system("Color A4");
-    std::cout << "-----------------checkInsert---------------" << std::endl;
-    std::cout << "in order" << std::endl;
-    a.inOrder(a.head);
-    std::cout << "\npre order" << std::endl;
-    a.preOrder(a.head);
+
+
+void printAvlTree(avl_tree<Player, changeData> &avl) {
+        std::cout << "inOrder:" << std::endl;
+        avl.inOrder(avl.head);
+        std::cout << std::endl;
+        std::cout << "preOrder:" << std::endl;
+        avl.preOrder(avl.head);
+        std::cout << std::endl;
+        std::cout << "nodes:" << avl.countAvlNodes()<< std::endl;
+        std::cout << "_________________________________" << std::endl;
 }
-
-bool isExists() {
-    system("Color A4");
-    std::cout << "-----------------isExists---------------" << std::endl;
-    avl_tree<int, int> a = avl_tree<int, int>();
-    a.head = a.insert_node(a.head, 1);
-    a.head = a.insert_node(a.head, 2);
-    a.head = a.insert_node(a.head, 4);
-    a.head = a.insert_node(a.head, 20);
-    a.head = a.insert_node(a.head, 3);
-    a.head = a.insert_node(a.head, 5);
-    a.head = a.insert_node(a.head, 7);
-    a.head = a.insert_node(a.head, 21);
-    a.head = a.insert_node(a.head, 8);
-    a.head = a.insert_node(a.head, 99);
-    a.head = a.insert_node(a.head, 100);
-    assert(a.exists_in_avl_tree(a.head, 20));
-    assert(a.exists_in_avl_tree(a.head, 21));
-    assert(a.exists_in_avl_tree(a.head, 100));
-    assert(a.exists_in_avl_tree(a.head, 8));
-    assert(a.exists_in_avl_tree(a.head, 3));
-    assert(a.exists_in_avl_tree(a.head, 5));
-    if (a.exists_in_avl_tree(a.head, 55))
-        std::cout << "Problem - 55 is not in the fucking tree!!!" << std::endl;
-    else
-        std::cout << "" << std::endl;
-
-}
-
-void deleteNode() {
-    system("Color A4");
-    std::cout << "-----------------deleteNode---------------" << std::endl;
-    avl_tree<int, int> a = avl_tree<int, int>();
-    a.head = a.insert_node(a.head, 1);
-    a.head = a.insert_node(a.head, 2);
-    a.head = a.insert_node(a.head, 4);
-    a.head = a.insert_node(a.head, 20);
-    a.head = a.insert_node(a.head, 3);
-    a.head = a.insert_node(a.head, 5);
-    a.head = a.insert_node(a.head, 7);
-    a.head = a.insert_node(a.head, 21);
-    a.head = a.insert_node(a.head, 8);
-    a.head = a.insert_node(a.head, 99);
-    a.head = a.insert_node(a.head, 100);
-    try {
-        a.removeNode(3);
-        a.removeNode(5);
-//        a.removeNode(3);
-        a.removeNode(20);
-        a.removeNode(2);
-        a.removeNode(21);
-
-    } catch (avl_tree<int, int>::DataNotInTree &e) {
-        std::cout << "3 is not in the tree" << std::endl;
-    }
-    std::cout << "in order" << std::endl;
-    a.inOrder(a.head);
-    std::cout << "\npre order" << std::endl;
-    a.preOrder(a.head);
-}
-
-void extractToArray(){
-    system("Color A4");
-    std::cout << "-----------------extractToArray---------------" << std::endl;
-    avl_tree<int, int> a = avl_tree<int, int>();
-    a.head = a.insert_node(a.head, 1);
-    a.head = a.insert_node(a.head, 2);
-    a.head = a.insert_node(a.head, 4);
-    a.head = a.insert_node(a.head, 20);
-    a.head = a.insert_node(a.head, 3);
-    a.head = a.insert_node(a.head, 5);
-    a.head = a.insert_node(a.head, 7);
-    a.head = a.insert_node(a.head, 21);
-    a.head = a.insert_node(a.head, 8);
-    a.head = a.insert_node(a.head, 99);
-    a.head = a.insert_node(a.head, 100);
-    int sizeTree = a.countAvlNodes();
-    assert(sizeTree==11);
-    int* arr = a.extract_data_to_array(sizeTree);
-
-    std::cout << "arr:" << std::endl;
-    for(int i=0;i<sizeTree; i++){
-        std::cout<<arr[i]<<", ";
-    }
-    std::cout << "\nin order" << std::endl;
-    a.inOrder(a.head);
-
-}
-
 
 int main() {
-//    checkInsert();
-//    isExists();
-//    deleteNode();
-    extractToArray();
+
+    changeData c (4,12);
+    avl_tree<Player, changeData> avl;
+    Player p1 (1,0);
+    Player p2 (5,12);
+    Player p3 (4,0);
+    Player p4 (3,2);
+    Player p5 (9,2);
+    avl.head = avl.insert_node(avl.head, p1);
+//    avl.head = avl.insert_node(avl.head, p2);
+//    avl.head = avl.insert_node(avl.head, p3);
+//    avl.head = avl.insert_node(avl.head, p4);
+//    avl.head = avl.insert_node(avl.head, p5);
+//    printAvlTree(avl);
+
+
+
+//    avl.head = avl.insert_node(avl.head, 4);
+//    avl.head = avl.insert_node(avl.head, 2);
+//    avl.head = avl.insert_node(avl.head, 1);
+//    avl.head = avl.insert_node(avl.head, 6);
+//    avl.head = avl.insert_node(avl.head, 7);
+//    avl.head = avl.insert_node(avl.head, 9);
+//    avl.head = avl.insert_node(avl.head, 24);
+//    avl.head = avl.insert_node(avl.head, 70);
+//    avl.head = avl.insert_node(avl.head, 88);
+//    printAvlTree(avl);
+//    avl.updateNodeDataByFunction(c);
+//    printAvlTree(avl);
+
+//
+//
+//    printAvlTree(avl);
+//    avl.removeNode(4);
+//    printAvlTree(avl);
+//    avl.removeNode(5);
+//    printAvlTree(avl);
+//    avl.removeNode(7);
+//    printAvlTree(avl);
+//    avl.removeNode(6);
+//    printAvlTree(avl);
+//    avl.removeNode(1);
+//    printAvlTree(avl);
+//    avl.removeNode(2);
+//    printAvlTree(avl);
+//    avl.removeNode(70);
+//    printAvlTree(avl);
+//    avl.removeNode(9);
+//    printAvlTree(avl);
+//    avl.removeNode(88);
+//    printAvlTree(avl);
+//    avl.removeNode(24);
+//    printAvlTree(avl);
+////
+//
+
+//    std::cout << "Hello, World!" << std::endl;
     return 0;
 }
