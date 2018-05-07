@@ -63,7 +63,7 @@ public:
 
     void inOrder(avl_node<T> *head);
 
-    void insert_into_array_aux(T *, int*, avl_node<T> *);
+    void insert_into_array_aux(T *, int *, avl_node<T> *);
 
     void copyNode(avl_node<T> *const to, const avl_node<T> *from);
 
@@ -81,19 +81,18 @@ public:
 
     int countAvlNodes();
 
-    void remove_unnessesery_nodes(int *sizeActuallNode,
-                                  int *numFullTreeNodes,
+    void remove_unnessesery_nodes(int *sizeToRemove,
                                   avl_node<T> *node,
                                   avl_node<T> *father);
 
+    //avlFinal should be build - using new before calling this function
     void array_to_tree(T *arr, int size, avl_tree<T, Pred>
     *avlFinal);
 
-    void build_empty_tree(int n, avl_node<T> *node);
+    avl_node<T> *build_empty_tree(int n, avl_node<T> *node);
 
     void updateTreeHeight(avl_node<T> *node);
 
-//
     void insert_into_tree_from_array(int *size, T *arr, avl_node<T> *node,
                                      int *index);
 
@@ -234,7 +233,7 @@ avl_node<T> *avl_tree<T, Pred>::balance(avl_node<T> *temp) {
 template<typename T, typename Pred>
 T *avl_tree<T, Pred>::extract_data_to_array(int size) {
     T *treeArray = new T[size];
-    int i=0;
+    int i = 0;
     insert_into_array_aux(treeArray, &i, this->head);
     return treeArray;
 }
@@ -448,19 +447,33 @@ int avl_tree<T, Pred>::countAvlNodes() {
 
 
 template<typename T, typename Pred>
+void avl_tree<T, Pred>::insert_into_tree_from_array(int *size, T *arr, avl_node<T> *node,
+                                                    int *index) {
+    if (*size == (*index) )
+        return;
+    if (node == nullptr)
+        return;
+    this->insert_into_tree_from_array(size, arr, node->left, index);
+    node->data = arr[*index];
+    *index = *index + 1;
+    this->insert_into_tree_from_array(size, arr, node->right, index);
+}
+
+template<typename T, typename Pred>
 void avl_tree<T, Pred>::array_to_tree(T *arr, int size,
                                       avl_tree<T, Pred> *avlFinal) {
     if (arr == nullptr)
         return;
     double h = log2(size + 1) == ((int) (log2(size + 1))) ?
-               (int) (log2(size + 1)) - 1 : (int) (log2(size + 1)) - 1;
+               (int) (log2(size + 1)) - 1 : (int) (log2(size + 1)) ;
     int n = pow(2.0, h + 1) - 1;
 //    build full tree
-    build_empty_tree(n, avlFinal->head);
-    remove_unnessesery_nodes(&size, &n, avlFinal->head, nullptr);
-    int i;
-    insert_into_tree_from_array(&size, arr, avlFinal, &i);
-    updateTreeHeight(avlFinal);
+    avlFinal->head = build_empty_tree(n, avlFinal->head);
+    n = n-size;
+    remove_unnessesery_nodes(&n, avlFinal->head, nullptr);
+    int i = 0;
+    insert_into_tree_from_array(&size, arr, avlFinal->head, &i);
+    updateTreeHeight(avlFinal->head);
 }
 
 template<typename T, typename Pred>
@@ -472,59 +485,44 @@ void avl_tree<T, Pred>::updateTreeHeight(avl_node<T> *node) {
     updateHeight(node);
 }
 
-template<typename T, typename Pred>
-void avl_tree<T, Pred>::insert_into_tree_from_array(int *size, T *arr, avl_node<T> *node,
-                                                    int *index) {
-    if (*size == ((*index) + 1))
-        return;
-    if (node == nullptr)
-        return;
-    insert_into_tree_from_array(size, arr, node->left, index);
-    node->data = arr[index];
-    *index = *index + 1;
-    insert_into_tree_from_array(size, arr, node->right, index);
-}
-
 
 template<typename T, typename Pred>
-void avl_tree<T, Pred>::build_empty_tree(int n, avl_node<T> *node) {
+avl_node<T> *avl_tree<T, Pred>::build_empty_tree(int n, avl_node<T> *node) {
     if (n <= 0)
-        return;
+        return nullptr;
     else if (node == nullptr) {
         node = new avl_node<T>;
         node->left = nullptr;
         node->right = nullptr;
-        node->data = nullptr;
+//        node->data = nullptr;
         node->heightRight = 0;
         node->heightLeft = 0;
     }
-    build_empty_tree(n - ((n / 2) + 1), node->left);
-    build_empty_tree(n - ((n / 2) + 1), node->left);
+    node->right = build_empty_tree(n - ((n / 2) + 1), node->right);
+    node->left = build_empty_tree(n - ((n / 2) + 1), node->left);
 
 }
 
 template<typename T, typename Pred>
-void avl_tree<T, Pred>::remove_unnessesery_nodes(int *sizeActuallNode,
-                                                 int *numFullTreeNodes,
-                                                 avl_node<T> *node,
+void avl_tree<T, Pred>::remove_unnessesery_nodes(int *sizeToRemove, avl_node<T> *node,
                                                  avl_node<T> *father) {
-    if (*sizeActuallNode == *numFullTreeNodes)
+    if (*sizeToRemove == 0)
         return;
     if (node->left == nullptr && node->right == nullptr) {
         if (father->right == node) {
-            delete (father->right);
+            delete (node);
+            node= nullptr;
             father->right = nullptr;
         } else {
-            delete (father->left);
+            delete (node);
+            node= nullptr;
             father->left = nullptr;
         }
-        *sizeActuallNode--;
+        (*sizeToRemove)--;
         return;
     }
-    remove_unnessesery_nodes(sizeActuallNode, numFullTreeNodes, node->right,
-                             node);
-    remove_unnessesery_nodes(sizeActuallNode, numFullTreeNodes, node->left,
-                             node);
+    remove_unnessesery_nodes(sizeToRemove, node->right, node);
+    remove_unnessesery_nodes(sizeToRemove, node->left, node);
 }
 
 #endif //HW1DS_AVL_NODE_H
