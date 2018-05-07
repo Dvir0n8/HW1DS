@@ -55,8 +55,6 @@ public:
 
     avl_node<T> *insert_node(avl_node<T> *root, T data);
 
-//    void insert_node_aux(avl_node *node, T data);
-
     int bfCalculate(avl_node<T> *temp);
 
     void preOrder(avl_node<T> *head);
@@ -85,7 +83,7 @@ public:
                                   avl_node<T> *node,
                                   avl_node<T> *father);
 
-    //avlFinal should be build - using new before calling this function
+    //avlFinal should be built - using new before calling this function
     void array_to_tree(T *arr, int size, avl_tree<T, Pred>
     *avlFinal);
 
@@ -97,6 +95,7 @@ public:
                                      int *index);
 
     bool exists_in_avl_tree(avl_node<T> *, T data);
+
 
     class TreeException : public std::exception {
     };
@@ -238,7 +237,6 @@ T *avl_tree<T, Pred>::extract_data_to_array(int size) {
     return treeArray;
 }
 
-
 template<typename T, typename Pred>
 void avl_tree<T, Pred>::insert_into_array_aux(T *array, int *index,
                                               avl_node<T> *node) {
@@ -249,17 +247,6 @@ void avl_tree<T, Pred>::insert_into_array_aux(T *array, int *index,
     *index = *index + 1;
     insert_into_array_aux(array, index, node->right);
 }
-
-//
-//template<typename T, typename Pred>
-//void avl_tree::array_to_tree(T *arr, int size) {};
-//
-//template<typename T, typename Pred>
-//void avl_tree::update_node_data_by_function(Pred function) {};
-//
-//template<typename T, typename Pred>
-//int avl_tree::count_avl_nodes() {};
-//
 
 template<typename T, typename Pred>
 void avl_tree<T, Pred>::copyNode(avl_node<T> *const to, const avl_node<T>
@@ -289,7 +276,6 @@ void avl_tree<T, Pred>::updateHeight(avl_node<T> *root) {
     } else {
         root->heightRight = 0;
     }
-
 };
 
 template<typename T, typename Pred>
@@ -301,7 +287,6 @@ avl_node<T> *avl_tree<T, Pred>::findNextByInorder(avl_node<T> *root) {
     }
     return temp;
 };
-
 
 template<typename T, typename Pred>
 avl_node<T> *avl_tree<T, Pred>::removeNodeAux(avl_node<T> *root, avl_node<T>
@@ -327,7 +312,6 @@ avl_node<T> *avl_tree<T, Pred>::removeNodeAux(avl_node<T> *root, avl_node<T>
             }
             delete root;
             return father;
-
         } else if (root->left == nullptr || root->right == nullptr) {
 //             case root has only one child
             avl_node<T> *child = (root->left == nullptr) ? root->right
@@ -340,16 +324,11 @@ avl_node<T> *avl_tree<T, Pred>::removeNodeAux(avl_node<T> *root, avl_node<T>
             root->data = child->data;
             removeNodeAux(root->right, root, child->data);
         }
-
     }
-
-    // UPDATE HEIGHT OF THE CURRENT NODE
     updateHeight(root);
     if (father != nullptr && father->right == root) {
-//        updateHeight(father);
         father->right = balance(root);
     } else if (father != nullptr && father->left == root) {
-//        updateHeight(father);
         father->left = balance(root);
     } else if (father == nullptr && ((root->heightLeft - root->heightRight) > 1 ||
                                      (root->heightLeft - root->heightRight) < -1)) {
@@ -358,7 +337,6 @@ avl_node<T> *avl_tree<T, Pred>::removeNodeAux(avl_node<T> *root, avl_node<T>
         this->head = root;
     }
     return root;
-
 }
 
 template<typename T, typename Pred>
@@ -368,10 +346,6 @@ void avl_tree<T, Pred>::removeNode(const T &data) {
     }
     removeNodeAux(this->head, nullptr, data);
 };
-
-//
-//template<typename T, typename Pred>
-//void avl_tree::delete_all_tree() {};
 
 template<typename T, typename Pred>
 int avl_tree<T, Pred>::bfCalculate(avl_node<T> *temp) {
@@ -449,7 +423,7 @@ int avl_tree<T, Pred>::countAvlNodes() {
 template<typename T, typename Pred>
 void avl_tree<T, Pred>::insert_into_tree_from_array(int *size, T *arr, avl_node<T> *node,
                                                     int *index) {
-    if (*size == (*index) )
+    if (*size == (*index))
         return;
     if (node == nullptr)
         return;
@@ -465,11 +439,11 @@ void avl_tree<T, Pred>::array_to_tree(T *arr, int size,
     if (arr == nullptr)
         return;
     double h = log2(size + 1) == ((int) (log2(size + 1))) ?
-               (int) (log2(size + 1)) - 1 : (int) (log2(size + 1)) ;
+               (int) (log2(size + 1)) - 1 : (int) (log2(size + 1));
     int n = pow(2.0, h + 1) - 1;
 //    build full tree
     avlFinal->head = build_empty_tree(n, avlFinal->head);
-    n = n-size;
+    n = n - size;
     remove_unnessesery_nodes(&n, avlFinal->head, nullptr);
     int i = 0;
     insert_into_tree_from_array(&size, arr, avlFinal->head, &i);
@@ -511,11 +485,11 @@ void avl_tree<T, Pred>::remove_unnessesery_nodes(int *sizeToRemove, avl_node<T> 
     if (node->left == nullptr && node->right == nullptr) {
         if (father->right == node) {
             delete (node);
-            node= nullptr;
+            node = nullptr;
             father->right = nullptr;
         } else {
             delete (node);
-            node= nullptr;
+            node = nullptr;
             father->left = nullptr;
         }
         (*sizeToRemove)--;
