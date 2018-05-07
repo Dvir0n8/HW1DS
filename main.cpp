@@ -41,7 +41,7 @@ void checkInsert() {
     a.preOrder(a.head);
 }
 
-bool isExists() {
+void isExists() {
     system("Color A4");
     std::cout << "-----------------isExists---------------" << std::endl;
     avl_tree<int, int> a = avl_tree<int, int>();
@@ -119,14 +119,13 @@ void extractToArray() {
     int sizeTree = a.countAvlNodes();
     assert(sizeTree == 11);
     int *arr = a.extract_data_to_array(sizeTree);
-
     std::cout << "arr:" << std::endl;
     for (int i = 0; i < sizeTree; i++) {
         std::cout << arr[i] << ", ";
     }
     std::cout << "\nin order" << std::endl;
     a.inOrder(a.head);
-
+    delete[](arr);
 }
 
 void createAvlOutOfArr() {
@@ -158,13 +157,19 @@ void createAvlOutOfArr() {
     b.inOrder(b.head);
     std::cout << "\npre order b:" << std::endl;
     b.preOrder(b.head);
+    delete[](arr);
 }
 
 int main() {
-//    checkInsert();
-//    isExists();
-//    deleteNode();
-//    extractToArray();
+    checkInsert();
+    std::cout<<std::endl;
+    isExists();
+    std::cout<<std::endl;
+    deleteNode();
+    std::cout<<std::endl;
+    extractToArray();
+    std::cout<<std::endl;
     createAvlOutOfArr();
+    std::cout<<std::endl;
     return 0;
 }

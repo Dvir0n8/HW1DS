@@ -474,7 +474,7 @@ avl_node<T> *avl_tree<T, Pred>::build_empty_tree(int n, avl_node<T> *node) {
     }
     node->right = build_empty_tree(n - ((n / 2) + 1), node->right);
     node->left = build_empty_tree(n - ((n / 2) + 1), node->left);
-
+    return node;
 }
 
 template<typename T, typename Pred>
