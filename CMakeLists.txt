@@ -3,4 +3,4 @@ project(HW1DS)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(HW1DS main.cpp)
+add_executable(HW1DS avl_tree_test.cpp)
